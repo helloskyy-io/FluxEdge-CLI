@@ -6,6 +6,9 @@ build/
 *.test
 *.log
 
+# Env file
+.env
+
 # Cache & compiled binaries
 *.o
 *.a

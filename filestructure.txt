@@ -16,7 +16,8 @@ edge-cli/
 │   ├── auth.go         # Authentication management
 │── tests/              # Unit tests
 │   ├── api_test.go     # API test suite
-│── file structire.txt  # Go module file
+│── file structire.txt  # File structure
 │── go.mod              # Go module file
+│── go.sum              # ???
 │── main.go             # CLI entry point
 │── README.md           # Documentation
