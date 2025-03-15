@@ -1,0 +1,39 @@
+# Go-related exclusions
+bin/
+build/
+*.exe
+*.out
+*.test
+*.log
+
+# Cache & compiled binaries
+*.o
+*.a
+*.so
+
+# Dependency files (Go Modules)
+vendor/
+*.sum
+
+# IDE/editor metadata
+.vscode/
+.idea/
+*.swp
+*.swo
+
+# System files
+.DS_Store
+Thumbs.db
+
+# API keys, tokens, and secrets
+config/config.json
+config/config.yaml
+config/secrets.env
+
+# Logs & debug output
+logs/
+debug.log
+*.log
+
+# Temporary files
+/tmp/

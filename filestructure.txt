@@ -1,0 +1,22 @@
+edge-cli/
+│── api/                # API interactions (OOP-based)
+│   ├── client.go       # API Client struct (handles requests)
+│   ├── machines.go     # Machines API methods (get, rent, etc.)
+│   ├── deploy.go       # Deployment API methods
+│   ├── balance.go      # Financial tracking API methods
+│── cmd/                # CLI Commands (calls api functions)
+│   ├── root.go         # Root CLI command (entry point)
+│   ├── machines.go     # "get-machines", "rent-machine" CLI commands
+│   ├── deploy.go       # "deploy" CLI commands
+│   ├── balance.go      # "check-balance" CLI commands
+│── config/             # Configuration management
+│   ├── config.go       # Handles API key, env vars, user settings
+│── internal/           # Internal utilities (for logging, auth, helpers)
+│   ├── logger.go       # Logging functions
+│   ├── auth.go         # Authentication management
+│── tests/              # Unit tests
+│   ├── api_test.go     # API test suite
+│── file structire.txt  # Go module file
+│── go.mod              # Go module file
+│── main.go             # CLI entry point
+│── README.md           # Documentation
