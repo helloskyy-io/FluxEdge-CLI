@@ -1,3 +1,5 @@
+![Logo](/profile/frame_002.jpg)
+
 # Edge CLI 🚀  
 **A lightweight, high-performance CLI for interacting with the Edge Platform API.**  
 
