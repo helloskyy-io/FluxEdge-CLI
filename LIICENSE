@@ -1,0 +1,25 @@
+Business Source License 1.1
+
+Licensed Work: Edge CLI (edge-cli)
+
+Licensor: InFLux LLC
+
+Change Date: March 16, 2035 (on this date, this software will be relicensed under the [Apache 2.0/MIT License]).
+
+Licensed Grant:
+- You may use, modify, and distribute this software for any purpose EXCEPT providing a substantially similar or competitive service to [Edge CLI, FluxEdge, or other InFLux LLC products].
+- After the Change Date, this software will be available under [Apache 2.0/MIT License].
+
+Additional Use Grant:
+- Non-commercial and personal use is fully permitted.
+- Contributions are welcome and licensed under the same terms.
+- Internal commercial use within your own company is permitted.
+- You may create integrations, plugins, and extensions.
+
+Restrictions:
+- You **may not** offer the Licensed Work as a **cloud service, SaaS, or managed service** that competes with [Edge CLI, FluxEdge, or other InFLux LLC products].
+- You **may not** resell, sublicense, or commercially distribute the Licensed Work **without explicit written permission from InFLux LLC**.
+- You **may not** remove or alter this license notice.
+
+Disclaimer:
+This software is provided "as is," without warranties or guarantees. The Licensor (InFLux LLC) is not responsible for any damages resulting from the use of this software.
