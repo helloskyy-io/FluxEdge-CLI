@@ -23,8 +23,12 @@ var rootCmd = &cobra.Command{
 
 // Execute runs the CLI
 func Execute() {
-	// Load config (ensures API URL is available)
-	config.LoadConfig()
+	// ✅ Load config (Exit if missing or invalid)
+	cfg := config.LoadConfig()
+	if cfg == nil {
+		config.PrintOutput("❌ Failed to load configuration. Exiting...", "error", nil)
+		os.Exit(1)
+	}
 
 	// ✅ Set OutputFormat globally
 	if os.Getenv("OUTPUT_JSON") == "true" || config.OutputFormat == "json" {
@@ -38,6 +42,12 @@ func Execute() {
 	} else {
 		// ✅ Otherwise, load API key from environment variables or .env
 		config.LoadAPIKey()
+
+		// ❌ Ensure API key is actually loaded
+		if config.GetAPIKey() == "" {
+			config.PrintOutput("❌ No valid API key found after all checks. Exiting...", "error", nil)
+			os.Exit(1)
+		}
 	}
 
 	// ✅ Check if the DEBUG environment variable is set
@@ -46,8 +56,15 @@ func Execute() {
 		config.PrintOutput("DEBUG MODE ENABLED FROM ENV", "log", nil)
 	}
 
+	// ✅ Execute root command (Better error handling)
 	if err := rootCmd.Execute(); err != nil {
-		config.PrintOutput(err.Error(), "error", nil) // ✅ Updated to match new function signature
+		config.PrintOutput(err.Error(), "error", nil) // ✅ Use structured error output
+
+		// ✅ Ensure JSON output format is respected
+		if config.OutputFormat == "json" {
+			config.PrintOutput(map[string]string{"error": err.Error()}, "error", nil)
+		}
+
 		os.Exit(1)
 	}
 }

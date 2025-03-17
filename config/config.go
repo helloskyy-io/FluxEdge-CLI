@@ -14,40 +14,40 @@ import (
 
 // Config struct for YAML settings
 type Config struct {
-	APIURL string `yaml:"api_url"`
+	APIURL    string `yaml:"api_url"`
 	DebugMode bool   `yaml:"debug_mode"`
 }
 
 // Global variables
-var DebugMode bool           		// Debug mode flag
-var configLoaded bool        		// Ensures config loads once
-var APILoadedFrom string     		// Tracks where API key was loaded from
-var configData *Config       		// Store the config struct globally
-var apiKey string                  	// Declare API Key globally
-var OutputFormat string = "text"   	// ✅ Default output format
+var (
+	DebugMode       bool            // Debug mode flag
+	configLoaded    bool            // Ensures config loads once
+	APILoadedFrom   string          // Tracks where API key was loaded from
+	configData      *Config         // Store the config struct globally
+	apiKey          string          // API Key globally stored
+	OutputFormat    string = "text" // Default output format (text/json)
+)
 
-// LoadConfig reads config.yaml (Exits if missing/invalid)
+// LoadConfig reads config.yaml (FATAL exit if missing/invalid)
 func LoadConfig() *Config {
 	if configLoaded {
 		return configData
 	}
+
 	var config Config
 	file, err := ioutil.ReadFile("config/config.yaml")
 	if err != nil {
 		handleFatalError(fmt.Errorf("Critical Error: Missing config.yaml. This file is required to set the API endpoint."), 1)
-		return nil
 	}
 
 	err = yaml.Unmarshal(file, &config)
 	if err != nil {
 		handleFatalError(fmt.Errorf("Critical Error: config.yaml is invalid. Please check formatting."), 1)
-		return nil
 	}
 
-	// If the API URL is missing, that's also fatal
+	// If API URL is missing, that’s fatal
 	if config.APIURL == "" {
 		handleFatalError(fmt.Errorf("Critical Error: Missing API URL in config.yaml. This value is required."), 1)
-		return nil
 	}
 
 	DebugMode = config.DebugMode
@@ -71,21 +71,21 @@ func GetAPIKey() string {
 	return apiKey
 }
 
-// LoadAPIKey initializes the API key following the correct priority order
+// LoadAPIKey initializes the API key using a strict priority order
 func LoadAPIKey() {
-	// ✅ First, check if API key was set via `SetAPIKey()` (from CLI flag)
+	// ✅ 1st Priority: CLI Flag (`--api-key`)
 	if apiKey != "" {
 		return
 	}
 
-	// ✅ Second, try loading from environment variable
+	// ✅ 2nd Priority: Environment Variable
 	apiKeyEnv := os.Getenv("API_KEY")
 	if apiKeyEnv != "" {
 		SetAPIKey(apiKeyEnv, "Environment Variable")
 		return
 	}
 
-	// ✅ Third, try loading from `.env` file
+	// ✅ 3rd Priority: `.env` File
 	_ = godotenv.Load()
 	apiKeyEnv = os.Getenv("API_KEY")
 	if apiKeyEnv != "" {
@@ -93,8 +93,8 @@ func LoadAPIKey() {
 		return
 	}
 
-	// ❌ Fatal error: No API key found
-	handleFatalError(fmt.Errorf("API_KEY is not set. Provide it via --api-key flag, environment variable, or .env file."), 3)
+	// ❌ All API key sources failed: Fatal Error
+	handleFatalError(fmt.Errorf("API_KEY is missing. Provide it via --api-key flag, environment variable, or .env file."), 3)
 }
 
 // AddOutputFlag adds the `--output json` flag to a command
@@ -102,9 +102,9 @@ func AddOutputFlag(cmd *cobra.Command) {
 	cmd.Flags().StringVarP(&OutputFormat, "output", "o", "text", "Output format: text or json")
 }
 
-// handleFatalError manages fatal errors and formats them for JSON output if required
+// handleFatalError logs fatal errors and exits the program
 func handleFatalError(err error, exitCode int) {
-	if os.Getenv("OUTPUT_JSON") == "true" {
+	if OutputFormat == "json" || os.Getenv("OUTPUT_JSON") == "true" {
 		errorJSON, _ := json.MarshalIndent(map[string]interface{}{
 			"error": err.Error(),
 			"code":  exitCode,
@@ -115,4 +115,22 @@ func handleFatalError(err error, exitCode int) {
 	}
 
 	os.Exit(exitCode)
+}
+
+// handleError logs non-fatal errors (for debugging/logging purposes)
+func handleError(err error, exitCode int, fatal bool) {
+	if OutputFormat == "json" || os.Getenv("OUTPUT_JSON") == "true" {
+		errorJSON, _ := json.MarshalIndent(map[string]interface{}{
+			"error": err.Error(),
+			"code":  exitCode,
+		}, "", "  ")
+		fmt.Println(string(errorJSON))
+	} else {
+		fmt.Println("❌ ERROR:", err)
+	}
+
+	// Only exit if marked as fatal
+	if fatal {
+		os.Exit(exitCode)
+	}
 }

@@ -15,7 +15,12 @@ var outputFormat string
 func FormatMachines(data interface{}) string {
 	machines, ok := data.([]api.Machine)
 	if !ok {
-		return "Invalid data format"
+		return "❌ Error: Invalid data format received from API"
+	}
+
+	// ✅ Handle case where no machines are available
+	if len(machines) == 0 {
+		return "⚠️ No available machines found."
 	}
 
 	output := "Available Machines:\n"
@@ -35,21 +40,51 @@ var getMachinesCmd = &cobra.Command{
 		config.DebugMode, _ = cmd.Flags().GetBool("debug") // Set global DebugMode
 
 		// ✅ Log fetching message
-		config.PrintOutput("Fetching available machines...", "log", nil) 
-		
-		// API key 
+		config.PrintOutput("Fetching available machines...", "log", nil)
+
+		// ✅ Load API key and verify it's set
 		config.LoadAPIKey()
 		apiKey := config.GetAPIKey()
-		client := api.NewClient(apiKey)
-
-		// Fetch machines
-		machines, err := client.GetMachines()
-		if err != nil {
-			config.PrintOutput(err.Error(), "error", nil) // Handle errors through centralized function
+		if apiKey == "" {
+			config.PrintOutput("❌ API key is missing. Use --api-key flag or set it in environment variables.", "error", nil)
 			return
 		}
 
-		// Print output (JSON or structured human-readable text)
+		// ✅ Create API client
+		client := api.NewClient(apiKey)
+
+		// ✅ Fetch machines (Improved error handling)
+		machines, err := client.GetMachines()
+		if err != nil {
+			// Classify errors
+			if err.Error() == "unauthorized" {
+				config.PrintOutput("❌ Unauthorized: Invalid API Key", "error", nil)
+			} else if err.Error() == "timeout" {
+				config.PrintOutput("⚠️ API request timed out. Please try again.", "error", nil)
+			} else {
+				config.PrintOutput(fmt.Sprintf("❌ API Error: %s", err.Error()), "error", nil)
+			}
+			return
+		}
+
+		// ✅ Handle "no machines available" case correctly
+		if len(machines) == 0 {
+			if config.OutputFormat == "json" {
+				// ✅ Provide structured JSON response for automation
+				emptyResponse := map[string]interface{}{
+					"status":  "ok",
+					"message": "No available machines found.",
+					"data":    []api.Machine{}, // Empty array ensures valid JSON structure
+				}
+				config.PrintOutput(emptyResponse, "data", nil)
+			} else {
+				// ✅ Provide human-readable response
+				config.PrintOutput("⚠️ No available machines found.", "log", nil)
+			}
+			return
+		}
+
+		// ✅ Print output (JSON or structured human-readable text)
 		config.PrintOutput(machines, "data", FormatMachines)
 	},
 }
