@@ -1,6 +1,6 @@
 ![Logo](/hs_logo.jpg)
 
-# Edge CLI 🚀  
+# FluxEdge CLI 🚀  
 **A lightweight, high-performance CLI for interacting with the Edge Platform API.**  
 
 ![Go](https://img.shields.io/badge/Go-1.21-blue.svg)  
@@ -27,7 +27,7 @@
 To install `edge-cli` without compiling from source, download the latest release:
 
 ```bash
-curl -L -o edgeapi https://github.com/yourusername/edge-cli/releases/latest/download/edgeapi
+curl -L -o edgeapi https://github.com/helloskyy-io/FluxEdge-CLI/releases/latest/download/edgeapi
 chmod +x edgeapi
 ```
 
